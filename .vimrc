@@ -65,6 +65,11 @@ Plugin 'vim-scripts/ccase.vim'
 
 Plugin 'gustafj/vim-ttcn'
 
+Plugin 'MarcWeber/vim-addon-mw-utils'
+Plugin 'tomtom/tlib_vim'
+Plugin 'garbas/vim-snipmate'
+Plugin 'honza/vim-snippets'
+
 " Plugin 'Valloric/YouCompleteMe'
 
 " All of your Plugins must be added before the following line
@@ -87,10 +92,6 @@ set expandtab
 set shiftwidth=4
 set tabstop=4
 
-map <F2> :mksession! ~/.vim_session <CR>
-map <F3> :source ~/.vim_session <CR>
-map <F4> :BufExplorer <CR>
-
 " set ttcn
 au BufNewFile,BufRead *.ttcn  setf ttcn
 if !exists("g:ctags_ttcn_cmd")
@@ -100,7 +101,11 @@ endif
 function! GenTtcnTags()
     silent !clear
     " default editor start under testobjects
-    execute "!" . g:ctags_ttcn_cmd . " --line-directives=yes -h .ttcn.asn.ttcn3.asn1.3mp -R ../"
+    let b:mtas_ttcn3_to = "/vobs/ims_ttcn3/projects/TAS/imsas_ttcn/testobjects"
+    let b:mtas_ttcn3_fw = "/vobs/ims_ttcn3/projects/TAS/FTFW/ttcn"
+    let b:mtas_ttcn3 = "/vobs/ttcn/TCC_Releases"
+
+    execute "!" . g:ctags_ttcn_cmd . " -R " . b:mtas_ttcn3_fw . " " . b:mtas_ttcn3_to . " " . b:mtas_ttcn3
 endfunction
 
 function! TagbarToggleForTtcn()
@@ -124,14 +129,21 @@ endfunction
 command! -complete=shellcmd -nargs=+ Shell call s:ExecuteInShell(<q-args>)
 
 function! BuildTtcnCode()
+    let b:mtas_make_dir = "/vobs/ims_ttcn3/common/bin/.build"
     Shell /vobs/ims_ttcn3/projects/TAS/tools/tiger/src/ttcnmake.pl -dir=/vobs/ims_ttcn3/common/bin/.build -stopOnError
 endfunction
+" mapping key
+map , :BufExplorer <CR>
+map <F2> :mksession! ~/.vim_session <CR>
+map <F3> :source ~/.vim_session <CR>
 
 autocmd FileType ttcn map <F5> :call GenTtcnTags() <CR>
 " autocmd FileType ttcn nmap <F6> :call TagbarToggleForTtcn()<CR>
 autocmd FileType ttcn nmap <F7> :call BuildTtcnCode()<CR>
+autocmd FileType * nmap <F8> :call ReloadAllSnippets()<CR>
 
 if &term =~ '256color'
     set t_ut=
 endif
+
 
