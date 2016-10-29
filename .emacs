@@ -1,8 +1,12 @@
+(require 'package)
 
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("marmalade" . "https://marmalade-repo.org/packages/")
-                         ("melpa" . "http://melpa.org/packages/")))
+                         ("melpa" . "http://melpa.org/packages/")
+                         ("elpy" . "https://jorgenschaefer.github.io/packages/")
+			 ))
 (package-initialize)
+
 
 (unless package-archive-contents
   (package-refresh-contents))
@@ -24,11 +28,18 @@
                      neotree
                      irfc
                      edts
+		     elpy
+                     exec-path-from-shell
+                     magit
                      ))
 
 (dolist (package package-list)
   (unless (package-installed-p package)
     (package-install package)))
+
+;; bring shel exec path
+(when (memq window-system '(mac ns))
+  (exec-path-from-shell-initialize))
 
 ;; js configuration
 (add-to-list 'auto-mode-alist '("\\.json$" . js-mode))
@@ -244,6 +255,10 @@
 (defun my-after-init-hook ()
   (require 'edts-start))
 
+;; git
+(require 'magit)
+(setq magit-git-executable "/usr/local/bin/git")
+
 ;; bing dictionary query
 (defun bing-dict ()
   "Search current word in bing dictionary."
@@ -270,6 +285,11 @@
   )
 
 (global-set-key (kbd "C-c q") 'bing-dict)
+
+;; python
+(elpy-enable)
+(setq elpy-rpc-python-command "python3")
+(setq python-shell-interpreter "python3")
 
 ;; Basic editor control
 (setq-default indent-tabs-mode nil)
